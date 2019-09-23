@@ -41,7 +41,7 @@ class DatabaseHandler
      * @param string $password
      * @param string $driver
      * @param string $charset
-     * @return PDO \PDO
+     * @return DatabaseHandler
      */
     public function connect(
         string $database,
@@ -57,7 +57,7 @@ class DatabaseHandler
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         }
 
-        return $this->pdo;
+        return $this;
     }
 
     /**
@@ -245,6 +245,25 @@ class DatabaseHandler
     public function setFetchStyle(int $fetchStyle): DatabaseHandler
     {
         $this->fetchStyle = $fetchStyle;
+
+        return $this;
+    }
+
+    /**
+     * @return PDO
+     */
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
+
+    /**
+     * @param PDO $pdo
+     * @return DatabaseHandler
+     */
+    public function setPdo(PDO $pdo): DatabaseHandler
+    {
+        $this->pdo = $pdo;
 
         return $this;
     }
