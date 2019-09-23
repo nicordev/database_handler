@@ -14,15 +14,29 @@ $dbHandler->connect(
     "utf8",
     "mysql"
 );
+
 $dbHandler->purgeTable($table);
 
-for ($i = 0; $i < 10; $i++) {
-    $dbHandler->insertARow("task", [
-        "title" => "Demo task title $i",
-        "content" => "Demo task content $i",
-        "reference" => $i
-    ]);
-}
+//var_dump($dbHandler->getColumnNames($table));
+//var_dump($dbHandler->getColumns($table));
+
+//var_dump($dbHandler->isColumn($table, "title"));
+//var_dump($dbHandler->isColumn($table, "zog"));
+
+//
+//$result = $dbHandler->insertARow("task", [
+//    "title" => "zog",
+//    "content" => "zogzog",
+//    "reference" => 100
+//]);
+//
+//for ($i = 0; $i < 10; $i++) {
+//    $dbHandler->insertARow("task", [
+//        "title" => "Demo task title $i",
+//        "content" => "Demo task content $i",
+//        "reference" => $i
+//    ]);
+//}
 
 //$selectStatement = $dbHandler->select("task");
 //$tasks = $dbHandler->fetchAll($selectStatement, Task::class);
@@ -38,24 +52,33 @@ for ($i = 0; $i < 10; $i++) {
 //    ["reference" => 5],
 //    Task::class
 //);
-$task = $dbHandler->find(
-    $table,
-    ["reference" => 5],
-    Task::class,
-    "title, content"
-);
+//$task = $dbHandler->find(
+//    $table,
+//    ["reference" => 5],
+//    Task::class,
+//    "title, content"
+//);
+//
+//var_dump($task);
+//
+//var_dump($dbHandler->delete($table, "reference = 5"));
+//
+//$task = $dbHandler->find(
+//    $table,
+//    ["reference" => 5],
+//    Task::class,
+//    "title, content"
+//);
+//
+//var_dump($task);
 
-var_dump($task);
+$task = new Task();
+$task->setTitle("zog");
+$task->setContent("zogzog");
+$task->setReference(53);
 
-var_dump($dbHandler->delete($table, "reference = 5"));
+$dbHandler->insertEntity($table, $task);
 
-$task = $dbHandler->find(
-    $table,
-    ["reference" => 5],
-    Task::class,
-    "title, content"
-);
+$tasks = $dbHandler->findAll("task", Task::class);
 
-var_dump($task);
-
-
+var_dump($tasks);

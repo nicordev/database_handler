@@ -140,7 +140,11 @@ class DatabaseHandler
     public function find(string $table, array $criteria = ["id" => 1], ?string $entityClass = null, string $select = "*")
     {
         $property = array_key_first($criteria);
-        $statement = $this->select($table, $select, "{$property} = {$criteria[$property]}");
+        $value = $criteria[$property];
+        if (is_string($value)) {
+            $value = "'{$value}'";
+        }
+        $statement = $this->select($table, $select, "{$property} = {$value}");
 
         return $this->fetch($statement, $entityClass);
     }
@@ -208,6 +212,83 @@ class DatabaseHandler
     }
 
     /**
+     * Insert a row from an entity
+     *
+     * @param string $table
+     * @param $entity
+     * @return bool|false|PDOStatement
+     */
+    public function insertEntity(string $table, $entity)
+    {
+        $reflection = new \ReflectionObject($entity);
+        $properties = $reflection->getProperties();
+        $columns = $this->getColumnNames($table);
+        $propertiesAndValues = [];
+
+        foreach ($properties as $property) {
+            $propertyName = $property->name;
+
+            if (in_array($propertyName, $columns)) {
+                if ($property->isPrivate()) {
+                    $property->setAccessible(true);
+                }
+                $propertiesAndValues[$propertyName] = $property->getValue($entity);
+            }
+        }
+
+        return $this->insertARow($table, $propertiesAndValues);
+    }
+
+    /**
+     * Get the column names of a table
+     *
+     * @param string $table
+     * @return array
+     */
+    public function getColumnNames(string $table)
+    {
+        $columns = $this->getColumns($table);
+        $names = [];
+
+        foreach ($columns as $column) {
+            $names[] = reset($column);
+        }
+
+        return $names;
+    }
+
+    /**
+     * Get the column properties of a table
+     *
+     * @param string $table
+     * @return array
+     */
+    public function getColumns(string $table)
+    {
+        return $this->fetchAll(
+            $this->query("SHOW COLUMNS FROM $table"),
+            \PDO::FETCH_ASSOC
+        );
+    }
+
+    /**
+     * Check if a column exists in a table
+     *
+     * @param string $table
+     * @param string $column
+     * @return bool
+     */
+    public function isColumn(string $table, string $column)
+    {
+        return is_array(
+            $this->fetch(
+                $this->query("SHOW COLUMNS FROM $table LIKE '$column'"),
+                \PDO::FETCH_NUM
+            )
+        );
+    }
+
+    /**
      * Guess the table name from the entity class name
      *
      * @param $entity
@@ -250,18 +331,18 @@ class DatabaseHandler
     }
 
     /**
-     * @return PDO
+     * @return \PDO
      */
-    public function getPdo(): PDO
+    public function getPdo(): \PDO
     {
         return $this->pdo;
     }
 
     /**
-     * @param PDO $pdo
+     * @param \PDO $pdo
      * @return DatabaseHandler
      */
-    public function setPdo(PDO $pdo): DatabaseHandler
+    public function setPdo(\PDO $pdo): DatabaseHandler
     {
         $this->pdo = $pdo;
 
