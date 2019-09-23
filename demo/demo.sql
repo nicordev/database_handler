@@ -1,0 +1,11 @@
+CREATE SCHEMA IF NOT EXISTS demo_database_handler;
+
+DROP TABLE IF EXISTS task;
+
+CREATE TABLE IF NOT EXISTS task(
+    id INT UNSIGNED AUTO_INCREMENT,
+    title VARCHAR(255),
+    content VARCHAR(1000),
+    reference INT UNSIGNED UNIQUE,
+    PRIMARY KEY (id)
+);
