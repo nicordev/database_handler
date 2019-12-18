@@ -137,8 +137,12 @@ class DatabaseHandler
      * @param string $select
      * @return mixed
      */
-    public function find(string $table, array $criteria = ["id" => 1], ?string $entityClass = null, string $select = "*")
-    {
+    public function find(
+        string $table,
+        array $criteria = ["id" => 1],
+        ?string $entityClass = null,
+        string $select = "*"
+    ) {
         $property = array_key_first($criteria);
         $value = $criteria[$property];
         if (is_string($value)) {
@@ -158,8 +162,12 @@ class DatabaseHandler
      * @param string $select
      * @return array
      */
-    public function findAll(string $table, ?string $entityClass = null, ?string $where = null, string $select = "*")
-    {
+    public function findAll(
+        string $table,
+        ?string $entityClass = null,
+        ?string $where = null,
+        string $select = "*"
+    ) {
         $statement = $this->select($table, $select, $where);
 
         return $this->fetchAll($statement, $entityClass);
@@ -228,7 +236,7 @@ class DatabaseHandler
         foreach ($properties as $property) {
             $propertyName = $property->name;
 
-            if (in_array($propertyName, $columns)) {
+            if (in_array($propertyName, $columns)) { // TODO: change camelCase to snake_case
                 if ($property->isPrivate()) {
                     $property->setAccessible(true);
                 }
